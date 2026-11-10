@@ -174,24 +174,33 @@ report
 
 ```{r Exploratory Plots, echo=TRUE}
 #<------------------------
+
 #Exploratory Plots
+#The plot below shows that there is a positive correlation between a persons willingness of buying a EV raises when the environmental concern level
 plot(train_data$Will_Buy_EV ~ train_data$Environmental_Concern_Level)
 
+#The plot below shows the correlation between buying an EV dependent on age. The correlation between the two is low to zero
 plot(train_data$Will_Buy_EV ~ train_data$Age)
 
+#The plot below shows the correlation between buying an EV dependent on annual income. There is a small positive correlation between the two
 plot(train_data$Will_Buy_EV ~ train_data$Annual_Income_USD)
 
+#The plow below shows the correlation between buying an EV dependent on the number of charging stations near peoples house
 plot(train_data$Will_Buy_EV ~ train_data$Charging_Stations_Near_Home)
 
+#The plot below shows the correlation between buying an EV dependent on the number of charging stations near work places
 plot(train_data$Will_Buy_EV ~ train_data$Charging_Stations_Near_Work)
 
+#The plot below shows the counts of people buying a EV or not based on the environmental concern level
 ggplot(train_data,aes(x = Environmental_Concern_Level, fill = Will_Buy_EV)) +
   geom_histogram(bins=5, position="dodge")
 
+#The plot below shows a boxplot showing how likely someone would buy a EV based off the environmental concern level
 ggplot(train_data, aes(x = factor(Will_Buy_EV), y = Environmental_Concern_Level,
                        fill = factor(Will_Buy_EV))) +
   geom_boxplot()
 
+#The plot below shows the count of peopleq who would but an EV split by gender
 ggplot(train_data, aes(x = Gender, fill = Will_Buy_EV)) +
   geom_bar(position="dodge")
 
