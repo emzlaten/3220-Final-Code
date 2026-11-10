@@ -7,8 +7,8 @@ date: "2026-11-07"
 
 ### Problem Definition
 
-1.1 The central focus of this dataset is to provide insights into the factors influencing peoples' willingness to consider
-purchasing an electric vehicle (EV). In particular, this dataset includes factors ranging from peoples' age, income, and daily commute to their range anxiety level, environmental concern level, and whether or not a subsidy is available. 
+1.1 The central focus of this dataset is to provide insights into the factors influencing peoples' willingness to consider purchasing an electric vehicle (EV). In particular, this dataset includes factors ranging from peoples' age, income, and daily commute to their range anxiety level, environmental concern level, and whether or not a subsidy is available.   
+
 1.2 The target audience may include any of the following:
 
 * Automotive Original Equipment Manufacturers (OEMs): OEMs have a vested interest in consumer behavior and trends in
@@ -16,23 +16,23 @@ particular automotive subgroups. Electric vehicles are growing in popularity and
 
 * Local City Governments: Public charging stations require investment and planning from government. This data and analysis may assist in determining to what degree charging stations should be prioritized for the benefit of their citizens. 
 
-* Electric Utilities: Power companies would benefit from knowing how prevalent EVs are and how much they're influenced by local charging stations. If charging stations increased, there may be a change in peoples' willingness to buy EVs, and thus increase usage on these stations.
+* Electric Utilities: Power companies would benefit from knowing how prevalent EVs are and how much they're influenced by local charging stations. If charging stations increased, there may be a change in peoples' willingness to buy EVs, and thus increase usage on these stations.  
 
 
 1.3 Related Work **(TBD)**
 
 
-1.4 For measuring accuracy, since there is a large class imbalance (approximately 82.5% with 0 on Will_Buy_EV), a naive model assuming 0 for all data points would yield an 82.5% accuracy. So, accuracy will be a poor measure of success. Thus, measuring success will be done with the following:
+1.4 For measuring accuracy, since there is a large class imbalance (approximately 82.5% with 0 on Will_Buy_EV), a naive model assuming 0 for all data points would yield an 82.5% accuracy. So, accuracy will be a poor measure of success. Thus, measuring success will be done with the following:  
 
 * AOC/ROC: Measuring a model's discriminatory power.
 
 * Precision, Recall, and F1 Score: Ensuring the model minimizes false positives and false negatives.
 
-* **(TBD)**
+* AIC/BIC: Comparing model performance across all four models used.
 
 ### Data and Exploratory Analysis
 
-The dataset includes 15 features, including numerical, categorical, and character data types. The target feature is "Will_Buy_EV" which states whether an individual will express interest in buying an EV (0 for no, 1 for yes). The data is based on a real world situation but is synthetically-generated. 
+2.1 The dataset includes 15 features, including numerical, categorical, and character data types. The target feature is "Will_Buy_EV" which states whether an individual will express interest in buying an EV (0 for no, 1 for yes). The data is based on a real world situation but is synthetically-generated. 
 
 
 Summary of Features: 
@@ -55,10 +55,15 @@ Summary of Features:
 | **Range Anxiety Level** | Character |
 | **Will Buy EV** | Integer |
 
-Looking at the structure of classes in the training dataset, 82.54% of individuals indicated
-no intent to purchase an EV, while 18.46% indicated an intent to purchase an EV.
+Looking at the structure of classes in the training dataset, 82.54% of individuals indicated no intent to purchase an EV, while 18.46% indicated an intent to purchase an EV.
 
-2.2 
+2.2 Since this was a synthetically-generated dataset, there were no missing data points in any of the rows. The only transformation was to convert the target variable to a factor for plotting purposes. We found outliers for most of the numerical features, but given the large dataset, we decided not to remove any instances. 
+
+2.3 The packages used so far are dplyr and tidymodels. dplyr is being used for the arrange() function to sort columns. tidymodels is used to generate training, validation, and test sets.
+
+
+
+
 
 
 
@@ -119,6 +124,17 @@ sapply(train_data, typeof)
 #Subsidy_Available         Range_Anxiety_Level           Will_Buy_EV 
 #"character"                 "character"                 "character" 
 ```
+
+```{r Exploring Outliers, echo=FALSE}
+
+boxplot(train_data$Annual_Income_USD)
+boxplot_i <- boxplot(train_data$Daily_Commute_km)
+boxplot_i$stats
+
+```
+
+
+
 
 ```{r Proportion of Will_Buy_EV, echo=TRUE}
 
@@ -200,9 +216,17 @@ ggplot(train_data, aes(x = factor(Will_Buy_EV), y = Environmental_Concern_Level,
                        fill = factor(Will_Buy_EV))) +
   geom_boxplot()
 
-#The plot below shows the count of peopleq who would but an EV split by gender
+#The plot below shows the count of people who would buy an EV split by gender
 ggplot(train_data, aes(x = Gender, fill = Will_Buy_EV)) +
   geom_bar(position="dodge")
+
+#The plot below shows the count of people who would buy an EV split by which city type they live in
+ggplot(train_data, aes(x = City_Type, fill=Will_Buy_EV)) + 
+  geom_bar(position="dodge")
+
+#Table of percents of someone buying an EV based on where they live
+prop.table(table(City_Type = train_data$City_Type, Will_Buy_EV = train_data$Will_Buy_EV))
+
 
 #>------------------------
 ```
@@ -212,7 +236,7 @@ ggplot(train_data, aes(x = Gender, fill = Will_Buy_EV)) +
 
 
 
-```{r Exploratory Modeling, echo=TRUE}
+```{r Exploratory Modeling, echo=FALSE}
 model1 <- glm(reformulate(variables, response="Will_Buy_EV"), data=train_data, family=binomial(link="logit")) 
 
 
@@ -227,7 +251,7 @@ ggplot(train_data, aes(x = Annual_Income_USD, y = as.numeric(as.character(Will_B
   ylim(0,1)
 ```
 
-```{r Predictions, echo=TRUE}
+```{r Predictions, echo=FALSE}
 #hold all variables constant - copy first row 100 times
 new_data <- train_data[rep(1,100), ]
 
