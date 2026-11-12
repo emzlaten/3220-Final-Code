@@ -19,7 +19,7 @@ particular automotive subgroups. Electric vehicles are growing in popularity and
 * Electric Utilities: Power companies would benefit from knowing how prevalent EVs are and how much they're influenced by local charging stations. If charging stations increased, there may be a change in peoples' willingness to buy EVs, and thus increase usage on these stations.  
 
 
-1.3 Related Work **(TBD)**
+1.3 Related Work: Prediction of Electic Vehicle (EV) sales is a big topic today. There are many approaches being used. In one study we found, researchers from National Pingtung University in Taiwan used Machine Learning to predict trends of EV sales on a macro scale. They talk about how machine learning has replaced more traditional linear regression or similar models. They also heavily considered the environmental impact of a large portion of the population switching to EVs. An article by Bloomberg addressed the trending topic of the proportion of EV ownership by country. These trends can tell manufacturers which countries to focus on. Many automotive manufacturers also run their own studies to help determine the viability of EV production. Most of these studies are focused on global or national trends. However, our project is focused on the prediction of whether individuals will purchase an EV or not.
 
 
 1.4 For measuring accuracy, since there is a large class imbalance (approximately 82.5% with 0 on Will_Buy_EV), a naive model assuming 0 for all data points would yield an 82.5% accuracy. So, accuracy will be a poor measure of success. Thus, measuring success will be done with the following:  
@@ -64,13 +64,12 @@ Looking at the structure of classes in the training dataset, 82.54% of individua
 
 
 
+```{r setup, echo=FALSE, include=FALSE}
 
 
-
-```{r setup, include=FALSE}
-library(dplyr) #arrange func
-library(tidymodels) #training/test split
-library(janitor) #make_clean_names/clean_names() if needed
+suppressPackageStartupMessages(library(dplyr)) #arrange func
+suppressPackageStartupMessages(library(tidymodels)) #training/test split
+suppressPackageStartupMessages(library(janitor)) #make_clean_names/clean_names() if needed
 
 train_data <- read.csv("train.csv")
 sum(!complete.cases(train_data))
@@ -125,7 +124,7 @@ sapply(train_data, typeof)
 #"character"                 "character"                 "character" 
 ```
 
-```{r Exploring Outliers, echo=FALSE}
+```{r Exploring Outliers, echo=FALSE, include=FALSE}
 
 boxplot(train_data$Annual_Income_USD)
 boxplot_i <- boxplot(train_data$Daily_Commute_km)
@@ -134,9 +133,7 @@ boxplot_i$stats
 ```
 
 
-
-
-```{r Proportion of Will_Buy_EV, echo=TRUE}
+```{r Proportion of Will_Buy_EV, echo=FALSE, include=FALSE}
 
 summary(train_data$Will_Buy_EV)
 #Proportion of Will_Buy_EV on training/validation/testing data
@@ -167,7 +164,7 @@ prop.table(table(test_data$Will_Buy_EV))
 
 
 
-```{r Variable Selection, echo=TRUE}
+```{r Variable Selection, echo=FALSE, include=FALSE}
 report <- data.frame(Independent_Variable = character(), 
                      Correlation = numeric())
 options(scipen = 999)
@@ -188,47 +185,93 @@ report
 ```
 
 
-```{r Exploratory Plots, echo=TRUE}
-#<------------------------
+## Exploratory Plots for Numerical Features
 
-#Exploratory Plots
-#The plot below shows that there is a positive correlation between a persons willingness of buying a EV raises when the environmental concern level
+```{r Pie Chart Will_Buy_EV, fig.cap="The pie chart shows the percentage of individuals with expressed interest in purchasing an EV.", fig.align="center", echo=TRUE}
+
+counts <- table(train_data$Will_Buy_EV)
+percentages <- round(prop.table(counts) * 100, 1)
+
+pie(table(train_data$Will_Buy_EV), main = "Proportion of EV Purchase Interest",
+  labels = paste0(c("No (0)", "Yes (1)"), ": " , percentages, "%"), col = c("red", "green")
+)
+```
+
+
+```{r Will_Buy_EV vs ECL, fig.cap="The plot above shows that there is a positive correlation between a persons willingness of buying a EV raises when the environmental concern level.", fig.align="center", echo=TRUE}
+
 plot(train_data$Will_Buy_EV ~ train_data$Environmental_Concern_Level)
 
-#The plot below shows the correlation between buying an EV dependent on age. The correlation between the two is low to zero
+```
+
+```{r Will_Buy_EV vs Age, fig.cap="The plot above shows the correlation between buying an EV dependent on age. The correlation between the two is low to zero.", fig.align="center", echo=TRUE}
+
 plot(train_data$Will_Buy_EV ~ train_data$Age)
+```
 
-#The plot below shows the correlation between buying an EV dependent on annual income. There is a small positive correlation between the two
+
+```{r Will_Buy_EV vs Income, fig.cap="The plot above shows the correlation between buying an EV dependent on annual income. There is a small positive correlation between the two.", fig.align="center", echo=TRUE}
+
 plot(train_data$Will_Buy_EV ~ train_data$Annual_Income_USD)
+```
 
-#The plow below shows the correlation between buying an EV dependent on the number of charging stations near peoples house
+
+```{r Will_Buy_EV vs CS Near Home, fig.cap="The plot above shows the correlation between buying an EV dependent on the number of charging stations near peoples house.", fig.align="center", echo=TRUE}
+
 plot(train_data$Will_Buy_EV ~ train_data$Charging_Stations_Near_Home)
+```
 
-#The plot below shows the correlation between buying an EV dependent on the number of charging stations near work places
+```{r Will_Buy_EV vs CS Near Work,fig.cap="The plot above shows the correlation between buying an EV dependent on the number of charging stations near work places.", fig.align="center", echo=TRUE}
+
 plot(train_data$Will_Buy_EV ~ train_data$Charging_Stations_Near_Work)
+```
 
-#The plot below shows the counts of people buying a EV or not based on the environmental concern level
+```{r Age Distribution,fig.cap="The plot above shows the distribution of ages present in the dataset. Age appears normally distributed in this synthetically-generated dataset.", fig.align="center", echo=TRUE}
+
+ggplot(train_data, aes(x = Age)) +
+  geom_bar(bins=30)
+```
+
+
+```{r Income Distribution,fig.cap="The plot above shows the distribution of income present in the dataset. Incomes are generally normally distributed with some left skew due to incomes < $30K.", fig.align="center", echo=TRUE}
+
+ggplot(train_data, aes(x = Annual_Income_USD)) +
+  geom_histogram()
+```
+
+#Exploratory Plots for Categorical/Discrete Features
+
+```{r,fig.cap="The plot above shows the counts of people buying a EV or not based on the environmental concern level.", fig.align="center", echo=TRUE}
+
 ggplot(train_data,aes(x = Environmental_Concern_Level, fill = Will_Buy_EV)) +
   geom_histogram(bins=5, position="dodge")
+```
 
-#The plot below shows a boxplot showing how likely someone would buy a EV based off the environmental concern level
+```{r,fig.cap="The plot above shows a boxplot showing how likely someone would buy a EV based off the environmental concern level.", fig.align="center", echo=TRUE}
+
 ggplot(train_data, aes(x = factor(Will_Buy_EV), y = Environmental_Concern_Level,
                        fill = factor(Will_Buy_EV))) +
   geom_boxplot()
+```
 
-#The plot below shows the count of people who would buy an EV split by gender
+
+```{r Will_Buy_EV vs Gender,fig.cap="The plot above shows the count of people who would buy an EV split by gender.", fig.align="center", echo=TRUE}
+
 ggplot(train_data, aes(x = Gender, fill = Will_Buy_EV)) +
   geom_bar(position="dodge")
+```
 
-#The plot below shows the count of people who would buy an EV split by which city type they live in
+
+```{r Will_Buy_EV vs City Type,fig.cap="The plot above shows the count of people who would buy an EV split by which city type they live in.", fig.align="center", echo=TRUE}
+
 ggplot(train_data, aes(x = City_Type, fill=Will_Buy_EV)) + 
   geom_bar(position="dodge")
+```
 
-#Table of percents of someone buying an EV based on where they live
+```{r Prop Table by City Type,fig.cap="Proportion table of someone buying an EV based on where they live.", fig.align="center", echo=FALSE, include=FALSE}
+
 prop.table(table(City_Type = train_data$City_Type, Will_Buy_EV = train_data$Will_Buy_EV))
 
-
-#>------------------------
 ```
 
 
@@ -236,7 +279,7 @@ prop.table(table(City_Type = train_data$City_Type, Will_Buy_EV = train_data$Will
 
 
 
-```{r Exploratory Modeling, echo=FALSE}
+```{r Exploratory Modeling, echo=FALSE, include=FALSE}
 model1 <- glm(reformulate(variables, response="Will_Buy_EV"), data=train_data, family=binomial(link="logit")) 
 
 
@@ -251,7 +294,7 @@ ggplot(train_data, aes(x = Annual_Income_USD, y = as.numeric(as.character(Will_B
   ylim(0,1)
 ```
 
-```{r Predictions, echo=FALSE}
+```{r Predictions, echo=FALSE, include=FALSE}
 #hold all variables constant - copy first row 100 times
 new_data <- train_data[rep(1,100), ]
 
