@@ -1,7 +1,10 @@
 ---
-title: "TeamProject"
-output: html_document
+title: "Team 5 Deliverable 1"
+subtitle: Ryan Barile, Austin Fischbach, Erick Ramirez, Emery Zlaten
 date: "2026-11-07"
+output:
+  html_document: default
+  pdf_document: default
 ---
 ## 1. Problem Statement and Background
 
@@ -19,7 +22,9 @@ particular automotive subgroups. Electric vehicles are growing in popularity and
 * Electric Utilities: Power companies would benefit from knowing how prevalent EVs are and how much they're influenced by local charging stations. If charging stations increased, there may be a change in peoples' willingness to buy EVs, and thus increase usage on these stations.  
 
 
-1.3 Related Work: Prediction of Electic Vehicle (EV) sales is a big topic today. There are many approaches being used. In one study we found, researchers from National Pingtung University in Taiwan used Machine Learning to predict trends of EV sales on a macro scale. They talk about how machine learning has replaced more traditional linear regression or similar models. They also heavily considered the environmental impact of a large portion of the population switching to EVs. An article by Bloomberg addressed the trending topic of the proportion of EV ownership by country. These trends can tell manufacturers which countries to focus on. Many automotive manufacturers also run their own studies to help determine the viability of EV production. Most of these studies are focused on global or national trends. However, our project is focused on the prediction of whether individuals will purchase an EV or not.
+1.3 Related Work: Prediction of Electic Vehicle (EV) sales is a big topic today. There are many approaches being used. In one study we found, researchers from National Pingtung University in Taiwan used Machine Learning to predict trends of EV sales on a macro scale. They talk about how machine learning has replaced more traditional linear regression or similar models. They also heavily considered the environmental impact of a large portion of the population switching to EVs. An article by Bloomberg addressed the trending topic of the proportion of EV ownership by country. These trends can tell manufacturers which countries to focus on. Many automotive manufacturers also run their own studies to help determine the viability of EV production. Most of these studies are focused on global or national trends. However, our project is focused on the prediction of whether individuals will purchase an EV or not. 
+
+(Citations: https://www.sciencedirect.com/org/science/article/pii/S1062737523000574#secd5e912, https://about.bnef.com/insights/clean-transport/electric-vehicle-outlook/)
 
 
 1.4 For measuring accuracy, since there is a large class imbalance (approximately 82.5% with 0 on Will_Buy_EV), a naive model assuming 0 for all data points would yield an 82.5% accuracy. So, accuracy will be a poor measure of success. Thus, measuring success will be done with the following:  
@@ -30,7 +35,7 @@ particular automotive subgroups. Electric vehicles are growing in popularity and
 
 * AIC/BIC: Comparing model performance across all four models used.
 
-### Data and Exploratory Analysis
+## 2. Data and Exploratory Analysis
 
 2.1 The dataset includes 15 features, including numerical, categorical, and character data types. The target feature is "Will_Buy_EV" which states whether an individual will express interest in buying an EV (0 for no, 1 for yes). The data is based on a real world situation but is synthetically-generated. 
 
@@ -198,74 +203,110 @@ pie(table(train_data$Will_Buy_EV), main = "Proportion of EV Purchase Interest",
 ```
 
 
-```{r Will_Buy_EV vs ECL, fig.cap="The plot above shows that there is a positive correlation between a persons willingness of buying a EV raises when the environmental concern level.", fig.align="center", echo=TRUE}
+```{r Will_Buy_EV vs ECL, fig.cap="The plot above appears to show a positive correlation between environmental concern level and one's willingness to buy an EV. This feature appears to have the strongest linear correlation, so we anticipate it to be a more important feature in predicting willingness to buy an EV.", fig.align="center", echo=TRUE}
 
-plot(train_data$Will_Buy_EV ~ train_data$Environmental_Concern_Level)
+plot(train_data$Will_Buy_EV ~ train_data$Environmental_Concern_Level,
+     xlab = "Environmental Concern Level",
+     ylab = "Willingness to Buy EV (0 - No, 1 - Yes)",
+     main = "Environmental Concern Level vs Willingness to Buy EV")
 
 ```
 
-```{r Will_Buy_EV vs Age, fig.cap="The plot above shows the correlation between buying an EV dependent on age. The correlation between the two is low to zero.", fig.align="center", echo=TRUE}
+```{r Will_Buy_EV vs Age, fig.cap="The plot above shows the correlation between buying an EV dependent on age. There does not appear to be a strong correlation between the age of an individual and their willingness to buy an EV.", fig.align="center", echo=TRUE}
 
-plot(train_data$Will_Buy_EV ~ train_data$Age)
+plot(train_data$Will_Buy_EV ~ train_data$Age,
+     xlab = "Age",
+     ylab = "Willingness to Buy EV (0 - No, 1 - Yes)",
+     main = "Age vs Willingness to Buy EV")
 ```
 
 
-```{r Will_Buy_EV vs Income, fig.cap="The plot above shows the correlation between buying an EV dependent on annual income. There is a small positive correlation between the two.", fig.align="center", echo=TRUE}
+```{r Will_Buy_EV vs Income, fig.cap="The plot above shows the correlation between buying an EV dependent on annual income. There appears to be a positive linear relationship between income and willingness to buy an EV. As income increases, so does the willingness to buy an EV, on average.", fig.align="center", echo=TRUE}
 
-plot(train_data$Will_Buy_EV ~ train_data$Annual_Income_USD)
+plot(train_data$Will_Buy_EV ~ train_data$Annual_Income_USD,
+     xlab = "Annual Income (USD)",
+     ylab = "Willingness to Buy EV (0 - No, 1 - Yes)",
+     main = "Annual Income (USD) vs Willingness to Buy EV")
 ```
 
 
-```{r Will_Buy_EV vs CS Near Home, fig.cap="The plot above shows the correlation between buying an EV dependent on the number of charging stations near peoples house.", fig.align="center", echo=TRUE}
+```{r Will_Buy_EV vs CS Near Home, fig.cap="The plot above shows the correlation between buying an EV dependent on the number of charging stations near peoples house. This graph is surprising to us, as we expected the relationship to be strong and positive.", fig.align="center", echo=TRUE}
 
-plot(train_data$Will_Buy_EV ~ train_data$Charging_Stations_Near_Home)
+plot(train_data$Will_Buy_EV ~ train_data$Charging_Stations_Near_Home,
+     xlab = "Charging Stations Near Home",
+     ylab = "Willingness to Buy EV (0 - No, 1 - Yes)",
+     main = "Charging Stations Near Home vs Willingness to Buy EV")
 ```
 
-```{r Will_Buy_EV vs CS Near Work,fig.cap="The plot above shows the correlation between buying an EV dependent on the number of charging stations near work places.", fig.align="center", echo=TRUE}
+```{r Will_Buy_EV vs CS Near Work,fig.cap="The plot above shows the correlation between buying an EV dependent on the number of charging stations near work places. Similar to charging stations near home, there doesn't appear to be any relationship.", fig.align="center", echo=TRUE}
 
-plot(train_data$Will_Buy_EV ~ train_data$Charging_Stations_Near_Work)
+plot(train_data$Will_Buy_EV ~ train_data$Charging_Stations_Near_Work,
+     xlab = "Charging Stations Near Work",
+     ylab = "Willingness to Buy EV (0 - No, 1 - Yes)",
+     main = "Charging Stations Near Work vs Willingness to Buy EV")
 ```
 
-```{r Age Distribution,fig.cap="The plot above shows the distribution of ages present in the dataset. Age appears normally distributed in this synthetically-generated dataset.", fig.align="center", echo=TRUE}
+```{r Age Distribution,fig.cap="The plot above shows the distribution of ages present in the dataset. Age appears uniformly distributed in this synthetically-generated dataset. If this were a real-world dataset, we would expect a normal distribution of age.", fig.align="center", echo=TRUE}
 
-ggplot(train_data, aes(x = Age)) +
-  geom_bar(bins=30)
+suppressWarnings(ggplot(train_data, aes(x = Age)) +
+  geom_bar() +
+  labs(x = "Age",
+       y = "Count", 
+       title = "Distribution of Age"))
+
 ```
 
 
-```{r Income Distribution,fig.cap="The plot above shows the distribution of income present in the dataset. Incomes are generally normally distributed with some left skew due to incomes < $30K.", fig.align="center", echo=TRUE}
+```{r Income Distribution,fig.cap="The plot above shows the distribution of income present in the dataset. Incomes are generally normally distributed with some left skew due to incomes < $30K. From around 700,000 instances, the max annual income is around $200,000 USD.", fig.align="center", echo=TRUE}
 
-ggplot(train_data, aes(x = Annual_Income_USD)) +
-  geom_histogram()
+suppressWarnings(ggplot(train_data, aes(x = Annual_Income_USD)) +
+  geom_histogram(bins=30) +
+  labs(x = "Annual Income (USD)",
+       y = "Count", 
+       title = "Distribution of Annual Income (USD)"))
 ```
 
-#Exploratory Plots for Categorical/Discrete Features
+## Exploratory Plots for Categorical/Discrete Features
 
-```{r,fig.cap="The plot above shows the counts of people buying a EV or not based on the environmental concern level.", fig.align="center", echo=TRUE}
+```{r,fig.cap="The plot above shows the counts of people buying a EV or not based on the environmental concern level. For an environmental concern level of 5, it is easier to see that an individual is more willing to buy an EV than not.", fig.align="center", echo=TRUE}
 
 ggplot(train_data,aes(x = Environmental_Concern_Level, fill = Will_Buy_EV)) +
-  geom_histogram(bins=5, position="dodge")
+  geom_histogram(bins=5, position="dodge") +
+  labs(x = "Environmental Concern Level",
+       y = "Count", 
+       title = "Environmental Concern Plot by Willingness to Buy EV")
+
 ```
 
-```{r,fig.cap="The plot above shows a boxplot showing how likely someone would buy a EV based off the environmental concern level.", fig.align="center", echo=TRUE}
+```{r,fig.cap="The plot above shows a boxplot showing how likely someone would buy a EV based off the environmental concern level. Of all individuals willing to buy an EV, at least 75% cite themselves with a concern level of 4 or 5, with the median being 5.", fig.align="center", echo=TRUE}
 
 ggplot(train_data, aes(x = factor(Will_Buy_EV), y = Environmental_Concern_Level,
                        fill = factor(Will_Buy_EV))) +
-  geom_boxplot()
+  geom_boxplot() +
+  labs(x = "Willingness to Buy EV (0 - No, 1 - Yes)",
+       y = "Environmental Concern Level", 
+       title = "Willingness to Buy EV by Environmental Concern Level")
+
 ```
 
 
-```{r Will_Buy_EV vs Gender,fig.cap="The plot above shows the count of people who would buy an EV split by gender.", fig.align="center", echo=TRUE}
+```{r Will_Buy_EV vs Gender,fig.cap="The plot above shows the count of people who would buy an EV split by gender. There doesn't appear to be a large difference in willingness to buy an EV based on gender.", fig.align="center", echo=TRUE}
 
 ggplot(train_data, aes(x = Gender, fill = Will_Buy_EV)) +
-  geom_bar(position="dodge")
+  geom_bar(position="dodge") +
+  labs(x = "Gender",
+       y = "Count", 
+       title = "Distribution of Gender by Willingness to Buy EV")
 ```
 
 
-```{r Will_Buy_EV vs City Type,fig.cap="The plot above shows the count of people who would buy an EV split by which city type they live in.", fig.align="center", echo=TRUE}
+```{r Will_Buy_EV vs City Type,fig.cap="The plot above shows the count of people who would buy an EV split by which city type they live in. We found the graph surprising, since we would have expected urban drivers to be more likely to buy EVs, since access to chargers would have presumably been better.", fig.align="center", echo=TRUE}
 
 ggplot(train_data, aes(x = City_Type, fill=Will_Buy_EV)) + 
-  geom_bar(position="dodge")
+  geom_bar(position="dodge") +
+  labs(x = "City Type",
+       y = "Count", 
+       title = "Distribution of City Type by Willingness to Buy EV")
 ```
 
 ```{r Prop Table by City Type,fig.cap="Proportion table of someone buying an EV based on where they live.", fig.align="center", echo=FALSE, include=FALSE}
@@ -273,8 +314,6 @@ ggplot(train_data, aes(x = City_Type, fill=Will_Buy_EV)) +
 prop.table(table(City_Type = train_data$City_Type, Will_Buy_EV = train_data$Will_Buy_EV))
 
 ```
-
-
 
 
 
@@ -314,6 +353,12 @@ ggplot(new_data, aes(x = Environmental_Concern_Level, y = probability)) +
   labs(x = "Environmental Concern Level", y = "Predicted Probability of Buying an EV") +
   ylim(0,1)
 ```
+
+
+
+
+### EDA Conclusions:
+Due to this being a synthetically generated data set, there are some weird behaviors with some of the features. Age appears to be uniformly distributed which does not match real world age distribution. We hypothesized that charging station availability would have a stronger correlation, but our initial graphs seem to show that almost no correlation exists with whether or not an individual will buy an EV. Based on our exploratory plots we think that Environmental Concern Level and Annual Income will be the best linear predictors for willingness to make an EV purchase.
 
 
 
