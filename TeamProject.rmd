@@ -1,11 +1,12 @@
 ---
-title: "Team 5 Deliverable 1"
+title: "Team 5 Deliverable 2"
 subtitle: Ryan Barile, Austin Fischbach, Erick Ramirez, Emery Zlaten
-date: "2026-11-07"
+date: "2026-11-17"
 output:
   html_document: default
   pdf_document: default
 ---
+
 ## 1. Problem Statement and Background
 
 ### Problem Definition
@@ -29,7 +30,7 @@ particular automotive subgroups. Electric vehicles are growing in popularity and
 
 1.4 For measuring accuracy, since there is a large class imbalance (approximately 82.5% with 0 on Will_Buy_EV), a naive model assuming 0 for all data points would yield an 82.5% accuracy. So, accuracy will be a poor measure of success. Thus, measuring success will be done with the following:  
 
-* AOC/ROC: Measuring a model's discriminatory power.
+* AUC/ROC: Measuring a model's discriminatory power.
 
 * Precision, Recall, and F1 Score: Ensuring the model minimizes false positives and false negatives.
 
@@ -37,7 +38,7 @@ particular automotive subgroups. Electric vehicles are growing in popularity and
 
 ## 2. Data and Exploratory Analysis
 
-2.1 The dataset includes 15 features, including numerical, categorical, and character data types. The target feature is "Will_Buy_EV" which states whether an individual will express interest in buying an EV (0 for no, 1 for yes). The data is based on a real world situation but is synthetically-generated. 
+2.1 The data set includes 15 features, including numerical, categorical, and character data types. The target feature is "Will_Buy_EV" which states whether an individual will express interest in buying an EV (0 for no, 1 for yes). The data is based on a real world situation but is synthetically-generated. 
 
 
 Summary of Features: 
@@ -69,7 +70,7 @@ Looking at the structure of classes in the training dataset, 82.54% of individua
 
 
 
-```{r setup, echo=FALSE, include=FALSE}
+```{r setup1, echo=FALSE, include=FALSE}
 
 
 suppressPackageStartupMessages(library(dplyr)) #arrange func
@@ -190,9 +191,9 @@ report
 ```
 
 
-## Exploratory Plots for Numerical Features
+## Exploratory Plots
 
-```{r Pie Chart Will_Buy_EV, fig.cap="The pie chart shows the percentage of individuals with expressed interest in purchasing an EV.", fig.align="center", echo=TRUE}
+```{r Pie Chart Will_Buy_EV, fig.cap="The pie chart shows the percentage of individuals with expressed interest in purchasing an EV.", fig.align="center",fig.dim = c(4, 3), echo=FALSE, include=FALSE}
 
 counts <- table(train_data$Will_Buy_EV)
 percentages <- round(prop.table(counts) * 100, 1)
@@ -202,8 +203,61 @@ pie(table(train_data$Will_Buy_EV), main = "Proportion of EV Purchase Interest",
 )
 ```
 
+```{r exp_plots, echo=FALSE, fig.show='hold', fig.ncol=2, fig.dim=c(4.5),out.width='48%', fig.align='center', fig.cap="Relationships between EV purchase willingness and predictor variables", fig.subcap=c("1", "2", "3", "4", "5", "6"), include=TRUE}
 
-```{r Will_Buy_EV vs ECL, fig.cap="The plot above appears to show a positive correlation between environmental concern level and one's willingness to buy an EV. This feature appears to have the strongest linear correlation, so we anticipate it to be a more important feature in predicting willingness to buy an EV.", fig.align="center", echo=TRUE}
+plot(train_data$Will_Buy_EV ~ train_data$Environmental_Concern_Level,
+     xlab = "Environmental Concern Level",
+     ylab = "Willingness to Buy EV (0 - No, 1 - Yes)",
+     main = "Figure 1: Environmental Concern Level vs Willingness to Buy EV")
+
+plot(train_data$Will_Buy_EV ~ train_data$Age,
+     xlab = "Age",
+     ylab = "Willingness to Buy EV (0 - No, 1 - Yes)",
+     main = "Figure 2: Age vs Willingness to Buy EV")
+
+plot(train_data$Will_Buy_EV ~ train_data$Annual_Income_USD,
+     xlab = "Annual Income (USD)",
+     ylab = "Willingness to Buy EV (0 - No, 1 - Yes)",
+     main = "Figure 3: Annual Income (USD) vs Willingness to Buy EV")
+
+plot(train_data$Will_Buy_EV ~ train_data$Charging_Stations_Near_Home,
+     xlab = "Charging Stations Near Home",
+     ylab = "Willingness to Buy EV (0 - No, 1 - Yes)",
+     main = "Figure 4: Charging Stations Near Home vs Willingness to Buy EV")
+
+plot(train_data$Will_Buy_EV ~ train_data$Charging_Stations_Near_Work,
+     xlab = "Charging Stations Near Work",
+     ylab = "Willingness to Buy EV (0 - No, 1 - Yes)",
+     main = "Figure 5: Charging Stations Near Work vs Willingness to Buy EV")
+
+#suppressWarnings(ggplot(train_data, aes(x = Age)) +
+#  geom_bar() +
+#  labs(x = "Age",
+#       y = "Count", 
+#       title = "Figure 6: Distribution of Age"))
+
+suppressWarnings(ggplot(train_data, aes(x = Annual_Income_USD)) +
+  geom_histogram(bins=30) +
+  labs(x = "Annual Income (USD)",
+       y = "Count", 
+       title = "Figure 6: Distribution of Annual Income (USD)"))
+
+```
+
+* Figure 1 appears to show a positive correlation between environmental concern level and one's willingness to buy an EV. This feature appears to have the strongest linear correlation, so we anticipate it to be a more important feature in predicting willingness to buy an EV.
+
+* Figure 2 shows the correlation between buying an EV dependent on age. There does not appear to be a strong correlation between the age of an individual and their willingness to buy an EV.
+
+* Figure 3 shows the correlation between buying an EV dependent on annual income. There appears to be a positive linear relationship between income and willingness to buy an EV. As income increases, so does the willingness to buy an EV, on average.
+
+* Figure 4 shows the correlation between buying an EV dependent on the number of charging stations near peoples house. This graph is surprising to us, as we expected the relationship to be strong and positive.
+
+* Figure 5 shows the correlation between buying an EV dependent on the number of charging stations near work places. Similar to charging stations near home, there doesn't appear to be any relationship.
+
+* Figure 6 shows the distribution of income present in the dataset. Incomes are generally normally distributed with some left skew due to incomes < $30K. From around 700,000 instances, the max annual income is around \$200,000 USD.
+
+
+```{r Will_Buy_EV vs ECL, fig.cap="The plot above appears to show a positive correlation between environmental concern level and one's willingness to buy an EV. This feature appears to have the strongest linear correlation, so we anticipate it to be a more important feature in predicting willingness to buy an EV.", fig.align="center",fig.dim = c(6, 5), echo=FALSE, include=FALSE}
 
 plot(train_data$Will_Buy_EV ~ train_data$Environmental_Concern_Level,
      xlab = "Environmental Concern Level",
@@ -212,7 +266,7 @@ plot(train_data$Will_Buy_EV ~ train_data$Environmental_Concern_Level,
 
 ```
 
-```{r Will_Buy_EV vs Age, fig.cap="The plot above shows the correlation between buying an EV dependent on age. There does not appear to be a strong correlation between the age of an individual and their willingness to buy an EV.", fig.align="center", echo=TRUE}
+```{r Will_Buy_EV vs Age, fig.cap="The plot above shows the correlation between buying an EV dependent on age. There does not appear to be a strong correlation between the age of an individual and their willingness to buy an EV.", fig.align="center",fig.dim = c(6, 5), echo=FALSE, include=FALSE}
 
 plot(train_data$Will_Buy_EV ~ train_data$Age,
      xlab = "Age",
@@ -221,7 +275,7 @@ plot(train_data$Will_Buy_EV ~ train_data$Age,
 ```
 
 
-```{r Will_Buy_EV vs Income, fig.cap="The plot above shows the correlation between buying an EV dependent on annual income. There appears to be a positive linear relationship between income and willingness to buy an EV. As income increases, so does the willingness to buy an EV, on average.", fig.align="center", echo=TRUE}
+```{r Will_Buy_EV vs Income, fig.cap="The plot above shows the correlation between buying an EV dependent on annual income. There appears to be a positive linear relationship between income and willingness to buy an EV. As income increases, so does the willingness to buy an EV, on average.", fig.align="center", fig.dim = c(6, 5),echo=FALSE, include=FALSE}
 
 plot(train_data$Will_Buy_EV ~ train_data$Annual_Income_USD,
      xlab = "Annual Income (USD)",
@@ -230,7 +284,7 @@ plot(train_data$Will_Buy_EV ~ train_data$Annual_Income_USD,
 ```
 
 
-```{r Will_Buy_EV vs CS Near Home, fig.cap="The plot above shows the correlation between buying an EV dependent on the number of charging stations near peoples house. This graph is surprising to us, as we expected the relationship to be strong and positive.", fig.align="center", echo=TRUE}
+```{r Will_Buy_EV vs CS Near Home, fig.cap="The plot above shows the correlation between buying an EV dependent on the number of charging stations near peoples house. This graph is surprising to us, as we expected the relationship to be strong and positive.", fig.align="center",fig.dim = c(6, 5), echo=FALSE, include=FALSE}
 
 plot(train_data$Will_Buy_EV ~ train_data$Charging_Stations_Near_Home,
      xlab = "Charging Stations Near Home",
@@ -238,7 +292,7 @@ plot(train_data$Will_Buy_EV ~ train_data$Charging_Stations_Near_Home,
      main = "Charging Stations Near Home vs Willingness to Buy EV")
 ```
 
-```{r Will_Buy_EV vs CS Near Work,fig.cap="The plot above shows the correlation between buying an EV dependent on the number of charging stations near work places. Similar to charging stations near home, there doesn't appear to be any relationship.", fig.align="center", echo=TRUE}
+```{r Will_Buy_EV vs CS Near Work,fig.cap="The plot above shows the correlation between buying an EV dependent on the number of charging stations near work places. Similar to charging stations near home, there doesn't appear to be any relationship.", fig.align="center",fig.dim = c(4, 3), echo=FALSE, include=FALSE}
 
 plot(train_data$Will_Buy_EV ~ train_data$Charging_Stations_Near_Work,
      xlab = "Charging Stations Near Work",
@@ -246,29 +300,27 @@ plot(train_data$Will_Buy_EV ~ train_data$Charging_Stations_Near_Work,
      main = "Charging Stations Near Work vs Willingness to Buy EV")
 ```
 
-```{r Age Distribution,fig.cap="The plot above shows the distribution of ages present in the dataset. Age appears uniformly distributed in this synthetically-generated dataset. If this were a real-world dataset, we would expect a normal distribution of age.", fig.align="center", echo=TRUE}
+```{r Age Distribution,fig.cap="The plot above shows the distribution of ages present in the dataset. Age appears uniformly distributed in this synthetically-generated dataset. If this were a real-world dataset, we would expect a normal distribution of age.", fig.align="center",fig.dim = c(6, 5), echo=FALSE, include=FALSE}
 
 suppressWarnings(ggplot(train_data, aes(x = Age)) +
   geom_bar() +
   labs(x = "Age",
        y = "Count", 
-       title = "Distribution of Age"))
+       title = "Figure 6: Distribution of Age"))
 
 ```
 
 
-```{r Income Distribution,fig.cap="The plot above shows the distribution of income present in the dataset. Incomes are generally normally distributed with some left skew due to incomes < $30K. From around 700,000 instances, the max annual income is around $200,000 USD.", fig.align="center", echo=TRUE}
+```{r Income Distribution,fig.cap="The plot above shows the distribution of income present in the dataset. Incomes are generally normally distributed with some left skew due to incomes < $30K. From around 700,000 instances, the max annual income is around $200,000 USD.", fig.align="center",fig.dim = c(4, 3), echo=FALSE, include=FALSE}
 
 suppressWarnings(ggplot(train_data, aes(x = Annual_Income_USD)) +
   geom_histogram(bins=30) +
   labs(x = "Annual Income (USD)",
        y = "Count", 
-       title = "Distribution of Annual Income (USD)"))
+       title = "Figure 7: Distribution of Annual Income (USD)"))
 ```
 
-## Exploratory Plots for Categorical/Discrete Features
-
-```{r,fig.cap="The plot above shows the counts of people buying a EV or not based on the environmental concern level. For an environmental concern level of 5, it is easier to see that an individual is more willing to buy an EV than not.", fig.align="center", echo=TRUE}
+```{r,fig.cap="The plot above shows the counts of people buying a EV or not based on the environmental concern level. For an environmental concern level of 5, it is easier to see that an individual is more willing to buy an EV than not.", fig.align="center",fig.dim = c(4, 3), echo=FALSE, include=FALSE}
 
 ggplot(train_data,aes(x = Environmental_Concern_Level, fill = Will_Buy_EV)) +
   geom_histogram(bins=5, position="dodge") +
@@ -278,7 +330,7 @@ ggplot(train_data,aes(x = Environmental_Concern_Level, fill = Will_Buy_EV)) +
 
 ```
 
-```{r,fig.cap="The plot above shows a boxplot showing how likely someone would buy a EV based off the environmental concern level. Of all individuals willing to buy an EV, at least 75% cite themselves with a concern level of 4 or 5, with the median being 5.", fig.align="center", echo=TRUE}
+```{r,fig.cap="The plot above shows a boxplot showing how likely someone would buy a EV based off the environmental concern level. Of all individuals willing to buy an EV, at least 75% cite themselves with a concern level of 4 or 5, with the median being 5.", fig.align="center",fig.dim = c(4, 3), echo=FALSE, include=FALSE}
 
 ggplot(train_data, aes(x = factor(Will_Buy_EV), y = Environmental_Concern_Level,
                        fill = factor(Will_Buy_EV))) +
@@ -290,7 +342,7 @@ ggplot(train_data, aes(x = factor(Will_Buy_EV), y = Environmental_Concern_Level,
 ```
 
 
-```{r Will_Buy_EV vs Gender,fig.cap="The plot above shows the count of people who would buy an EV split by gender. There doesn't appear to be a large difference in willingness to buy an EV based on gender.", fig.align="center", echo=TRUE}
+```{r Will_Buy_EV vs Gender,fig.cap="The plot above shows the count of people who would buy an EV split by gender. There doesn't appear to be a large difference in willingness to buy an EV based on gender.", fig.align="center",fig.dim = c(4, 3), echo=FALSE, include=FALSE}
 
 ggplot(train_data, aes(x = Gender, fill = Will_Buy_EV)) +
   geom_bar(position="dodge") +
@@ -300,7 +352,7 @@ ggplot(train_data, aes(x = Gender, fill = Will_Buy_EV)) +
 ```
 
 
-```{r Will_Buy_EV vs City Type,fig.cap="The plot above shows the count of people who would buy an EV split by which city type they live in. We found the graph surprising, since we would have expected urban drivers to be more likely to buy EVs, since access to chargers would have presumably been better.", fig.align="center", echo=TRUE}
+```{r Will_Buy_EV vs City Type,fig.cap="The plot above shows the count of people who would buy an EV split by which city type they live in. We found the graph surprising, since we would have expected urban drivers to be more likely to buy EVs, since access to chargers would have presumably been better.", fig.align="center",fig.dim = c(4, 3), echo=FALSE, include=FALSE}
 
 ggplot(train_data, aes(x = City_Type, fill=Will_Buy_EV)) + 
   geom_bar(position="dodge") +
@@ -359,6 +411,271 @@ ggplot(new_data, aes(x = Environmental_Concern_Level, y = probability)) +
 
 ### EDA Conclusions:
 Due to this being a synthetically generated data set, there are some weird behaviors with some of the features. Age appears to be uniformly distributed which does not match real world age distribution. We hypothesized that charging station availability would have a stronger correlation, but our initial graphs seem to show that almost no correlation exists with whether or not an individual will buy an EV. Based on our exploratory plots we think that Environmental Concern Level and Annual Income will be the best linear predictors for willingness to make an EV purchase.
+
+## Methods   
+
+1. Describe the methods you plan to use (models, data preparation, feature engineering)
+
+* Baseline model: Given the high class imbalance (~82.5% individuals not expressing interest in purchasing an EV), a naive model would predict 0 for all individuals. So, it would have an accuracy of 82.5%.
+
+* Logistic Regression - Our problem is a classification problem and logistic regression produces probabilities that certain individuals will be classified as expressing interest in buying an EV or not expressing that interest. Logistic regression only requires that the target variable be classified as a factor for predicting discrete values (0 or 1). 
+
+* Random Forest - Also a classification algorithm. We have numerical and categorical features, so without needing to standardize our data, we can use both in the same model, effectively separating intervals of potential indicators for predicting willingness to buy an EV or not. No additional feature engineering, specifically standardization, is required.
+
+* k-Means: Classification algorithm designed to produce clusters/centroids which attempt to categorize all data into distinct groups, each with a respective probability representing willingness to buy an EV or not. k-Means requires standardization since certain numerical features differ in scale. 
+
+* e-Means: e-Means operates very similarly to k-Means but the primary difference is in the calculation of the clusters/centroids. Traditional k-Means operates on full-batch optimization, whereas e-Means resorts to mini-batch and handles updates through an exponential moving average.
+
+* We decided against a single classification decision tree for this project and opted for random forest, since random forest utilizes many trees to aggregate their results and produce more consistent, average results. 
+
+
+2. Justify your methods based on the problem. Mention methods you considered but did not use, and why
+
+* Each of the algorithms we decided on are intended to solve classification problems. Since our target variable is a binary (0 or 1), we aim to correctly classify individuals as expressing interest in purchasing an EV or not. Any regression algorithms that produce a continuous value are unsuitable for the task, since a value between 0 and 1 is not interpretable. Linear regression, multiple linear regression, and any nonlinear regression would subsequently fail to produce an adequate prediction to the problem. 
+
+
+## Tools and Reproducibility  
+
+
+1. List the R packages and any other tools you used, and why you chose to use them
+
+* dplyr - Arrange function for sorting
+
+* tidymodels - Training/test split
+
+* ranger - Fast random forest implementation
+
+* emeansR - Implementation of e-Means
+
+* tidyverse - Used for the select() function
+
+2. Explain what worked well, what did not, and any tools you tried and dropped
+
+* We initially tried the rand_forest() with engine set to randomForest, but due to the data size and dimension of the data set, run time was exceptionally high. Ranger proved a much faster implementation. 
+
+
+3. Explain how someone else can rerun your work 
+
+* We have a repository on GitHub (https://github.com/emzlaten/3220-Final-Code). To run the R markdown file, one needs to simply run all the code or just individual chunks. We used a seed of 42 for all splits and modeling. Our current R version is: 2026.10.1+239.
+
+
+```{r setup2, echo=FALSE, include=FALSE}
+
+
+suppressPackageStartupMessages(library(dplyr)) #arrange func
+suppressPackageStartupMessages(library(tidymodels)) #training/test split
+suppressPackageStartupMessages(library(ranger)) #fast ensemble for random forest
+
+#remotes::install_github("ToledoEM/emeansR")
+#requires rust installation / brew install rust if using homebrew. 
+suppressPackageStartupMessages(library(emeansR))
+
+train_data <- read.csv("train.csv")
+sum(!complete.cases(train_data))
+#0 rows including missing data
+
+
+train_data <- read.csv("train.csv") |>
+  na.omit()
+
+variables <- names(train_data)
+variables <- variables[-15]
+variables <- variables[-1]
+
+
+set.seed(42)
+#pure data split - may improve with stratified sampling, strata = Will_Buy_EV,
+#to maintain proportions, given such a class imbalance
+
+data_split <- initial_split(train_data, prop=0.70)
+train_data <- training(data_split)
+test_val_data <- testing(data_split)
+
+data_split2 <- initial_split(test_val_data, prop=0.5)
+val_data <- training(data_split2)
+test_data <- testing(data_split2)
+
+
+train_data$Will_Buy_EV <- ifelse(train_data$Will_Buy_EV == "Yes", 1, 0)
+train_data$Will_Buy_EV <- as.factor(train_data$Will_Buy_EV)
+
+test_data$Will_Buy_EV <- ifelse(test_data$Will_Buy_EV == "Yes", 1, 0)
+test_data$Will_Buy_EV <- as.factor(test_data$Will_Buy_EV)
+
+val_data$Will_Buy_EV <- ifelse(val_data$Will_Buy_EV == "Yes", 1, 0)
+val_data$Will_Buy_EV <- as.factor(val_data$Will_Buy_EV)
+
+
+summary(train_data$Will_Buy_EV)
+sapply(train_data, typeof)
+
+
+#   id                         Age                  Annual_Income_USD 
+#"integer"                   "integer"                    "double" 
+
+#Daily_Commute_km        Number_of_Cars_Owned   Charging_Stations_Near_Home 
+#"double"                   "integer"                   "integer" 
+
+#Charging_Stations_Near_Work     Environmental_Concern_Level          Gender 
+#"integer"                                "double"                  "character" 
+
+#City_Type                Current_Car_Type            Home_Charging_Possible 
+#"character"                 "character"                 "character" 
+
+#Subsidy_Available         Range_Anxiety_Level           Will_Buy_EV 
+#"character"                 "character"                 "character" 
+```
+
+```{r calc_AUC function, echo=FALSE, include=FALSE}
+
+#helper function to compute ROC-AUC
+#event_level = "second" to target "1" aka "yes" to Will_Buy_EV
+calc_auc <- function(df, model_name) {
+  auc <- roc_auc(df, truth = Will_Buy_EV, .pred_1, event_level = "second")$.estimate
+  cat(sprintf("[%s] Validation ROC-AUC: %.4f\n", model_name, auc))
+}
+
+```
+
+
+```{r Logistic Regression, echo=FALSE, include=FALSE}
+#fit logistic regression with assumed valuable predictors
+#predict Will_Buy_EV by features: everything except ID and also an interaction term of Income x ECL
+#(whether or not being environmentally concerned has a stronger effect on wealthy citizens than non-wealthy citizens)
+#underlying assumption is that ECL on its own is insufficient and some degree of income is required to make the decision to purchase an EV
+
+logit_fit <- glm(Will_Buy_EV ~ . - id + Annual_Income_USD:Environmental_Concern_Level,
+  data = train_data,family = binomial(link = "logit"))
+
+# predict probabilities on validation data
+val_preds_logit <- val_data |>
+  mutate(.pred_1 = predict(logit_fit, newdata = val_data, type = "response"),
+    .pred_0 = 1 - .pred_1)
+
+calc_auc(val_preds_logit, "Logistic Regression")
+# [Logistic Regression] Validation ROC-AUC: 0.9384
+```
+
+
+```{r Random Forest, echo=FALSE, include=FALSE}
+
+rf_fit <- ranger(formula = Will_Buy_EV ~ . - id,data = train_data,
+  num.trees = 300, #bagging (bootstrap aggregating) - 300 independent decision trees
+  probability = TRUE,       # outputs probabilities rather than hard 0 or 1 classes
+  importance = "impurity",  # Gini feature importance rankings
+  seed = 42)
+
+# Predict on validation data
+rf_pred_obj <- predict(rf_fit, data = val_data)
+
+#mutate validation data for 2 columns: predicted prob that will_buy = 0 and 1
+val_preds_rf <- val_data |>
+  mutate(.pred_1 = rf_pred_obj$predictions[, "1"],
+    .pred_0 = rf_pred_obj$predictions[, "0"])
+
+calc_auc(val_preds_rf, "Random Forest")
+#[Random Forest] Validation ROC-AUC: 0.9385
+```
+
+```{r k-means, echo=FALSE, include=FALSE}
+# Select the continuous features identified during EDA
+cluster_vars <- c("Annual_Income_USD", "Age", "Daily_Commute_km", "Environmental_Concern_Level")
+
+#standardize using training set means and standard deviations (to avoid leakage from val data)
+#k-means requires euclidean distance metric, so terms must be identical in axes
+#income ranges between $20k : $200k, whereas ECL {1,2,3,4,5}
+train_means <- sapply(train_data[cluster_vars], mean)
+train_sds   <- sapply(train_data[cluster_vars], sd)
+
+#converts train_scaled and val_scaled into N x 4 matrices, where N = # of rows
+#4 columns - 1 for each of the cluster_vars converted to z-scores
+
+train_scaled <- scale(train_data[cluster_vars], center = train_means, scale = train_sds)
+val_scaled   <- scale(val_data[cluster_vars],   center = train_means, scale = train_sds)
+
+# fit k-means on the scaled training data (k = 5 clusters), 10 different starting configs,
+#and 25 number of reassignment iterations before stopping if centroids haven't converged
+set.seed(42)
+k_fit <- kmeans(train_scaled, centers = 5, nstart = 10, iter.max = 25)
+
+k_rates <- train_data |>
+  mutate(cluster = k_fit$cluster) |>
+  group_by(cluster) |>
+  summarize(buy_rate = mean(Will_Buy_EV == "1"))
+
+
+t(k_fit$centers) 
+
+typeof(k_rates$buy_rate)
+
+val_clusters_k <- apply(val_scaled, 1, function(individual) {
+  #k-fit$centers is a 5x4 matrix: (5 clusters x 4 features)
+  #transposing yields 4 x  matrix (4 features x 5 clusters)
+
+
+  distances <- colSums((t(k_fit$centers) - individual)^2)
+  #distances is now a vector full of values (distances) from each cluster
+  #return index of min column (aka which cluster produced the minimal distance)
+  #and assigns cluster # it most identifies the individual with
+  which.min(distances)})
+
+val_preds_kmeans <- val_data |>
+  mutate(cluster=val_clusters_k,
+         .pred_1 = k_rates$buy_rate[cluster],
+         .pred_0 = 1 - .pred_1)
+
+calc_auc(val_preds_kmeans, "k-Means Clustering")
+#[k-Means Clustering] Validation ROC-AUC: 0.7779
+```
+
+
+```{r e-means, echo=FALSE, include=FALSE}
+
+set.seed(42)
+emeans_fit <- emeans(train_scaled, k=5)
+
+print(emeans_fit$centers)
+
+emeans_rates <- train_data |>
+  mutate(cluster = emeans_fit$cluster) |>
+  group_by(cluster) |>
+  summarize(total = n(),
+            buyers = sum(Will_Buy_EV == "1"),
+            buy_rate = mean(Will_Buy_EV == "1")) |>
+  arrange(cluster)
+
+print(emeans_rates |> arrange(desc(buy_rate)))
+
+val_clusters_e <- apply(val_scaled, 1, function(person) {
+  distances <- colSums((t(emeans_fit$centers) - person)^2)
+  which.min(distances)})
+
+val_preds_emeans <- val_data |>
+  mutate(cluster = val_clusters_e,
+         .pred_1 = emeans_rates$buy_rate[cluster],
+         .pred_0 = 1 - .pred_1)
+
+calc_auc(val_preds_emeans, "e-Means Clustering")
+#[e-Means Clustering] Validation ROC-AUC: 0.7884
+```
+
+
+```{r Result Comparison, echo=FALSE, include=FALSE}
+roc_all <- bind_rows(
+  val_preds_logit  |> mutate(model = "Logistic Regression"),
+  val_preds_rf     |> mutate(model = "Random Forest"),
+  val_preds_kmeans |> mutate(model = "k-Means (k=5)"),
+  val_preds_emeans |> mutate(model = "e-means (k=5)")) |>
+  group_by(model) |>
+  roc_curve(truth = Will_Buy_EV, .pred_1, event_level = "second")
+
+autoplot(roc_all) +
+  labs(
+    title = "ROC Curves",
+    x = "False Positive Rate (1 - Specificity)",
+    y = "True Positive Rate (Sensitivity)"
+  )
+```
 
 
 
