@@ -8,5 +8,6 @@ The dataset contains 15 features including age, annual income, commute distance,
 
 
 
-To run the code, have the train.csv dataset and TeamProject.rmd in the same directory, then knit TeamProject.rmd.
+To run the code, have the train.csv dataset, the test.csv dataset and TeamProject.rmd in the same directory, then knit TeamProject.rmd.
 
+To run the scripts, make sure pROC and tidyverse is installed.
